@@ -1,6 +1,6 @@
 # name of LLM model, 'custom' for custom model
 llm: custom
-api_base: http://localhost:8001/v1
+api_base: http://localhost:7787/v1
 api_key: EMPTY
 llm_model_name: /new_disk4/xiaopeng_ye/LLMs/Qwen2.5-7B-Instruct
 # embedding model path
