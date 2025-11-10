@@ -38,7 +38,7 @@ embedding_size: 64
 # learning rate for recommender system model
 #lr: 0.001
 # number of epochs
-round: 110
+round: 3
 # number of agents, which cannot exceed the number of user in user.csv
 active_agent_threshold: 1500 #110
 # method for choose agent to be active, random, sample, or marginal
