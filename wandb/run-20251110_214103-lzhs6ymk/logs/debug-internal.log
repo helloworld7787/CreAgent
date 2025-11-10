@@ -1,0 +1,15 @@
+{"time":"2025-11-10T21:41:03.406540804+08:00","level":"INFO","msg":"stream: starting","core version":"0.19.8","symlink path":"/new_disk4/xiaopeng_ye/baosong_yuan/CreAgent/wandb/run-20251110_214103-lzhs6ymk/logs/debug-core.log"}
+{"time":"2025-11-10T21:41:03.524283663+08:00","level":"INFO","msg":"created new stream","id":"lzhs6ymk"}
+{"time":"2025-11-10T21:41:03.524341161+08:00","level":"INFO","msg":"stream: started","id":"lzhs6ymk"}
+{"time":"2025-11-10T21:41:03.525121362+08:00","level":"INFO","msg":"handler: started","stream_id":"lzhs6ymk"}
+{"time":"2025-11-10T21:41:03.524620814+08:00","level":"INFO","msg":"writer: Do: started","stream_id":"lzhs6ymk"}
+{"time":"2025-11-10T21:41:03.525382508+08:00","level":"INFO","msg":"sender: started","stream_id":"lzhs6ymk"}
+{"time":"2025-11-10T21:41:04.375250188+08:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-11-10T21:52:51.893447243+08:00","level":"INFO","msg":"stream: closing","id":"lzhs6ymk"}
+{"time":"2025-11-10T21:52:51.89350924+08:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-11-10T21:52:51.894517002+08:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-11-10T21:52:53.148671566+08:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-11-10T21:52:53.570677974+08:00","level":"INFO","msg":"handler: closed","stream_id":"lzhs6ymk"}
+{"time":"2025-11-10T21:52:53.57075205+08:00","level":"INFO","msg":"sender: closed","stream_id":"lzhs6ymk"}
+{"time":"2025-11-10T21:52:53.570738202+08:00","level":"INFO","msg":"writer: Close: closed","stream_id":"lzhs6ymk"}
+{"time":"2025-11-10T21:52:53.570893018+08:00","level":"INFO","msg":"stream: closed","id":"lzhs6ymk"}

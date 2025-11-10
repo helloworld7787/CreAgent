@@ -1,0 +1,23 @@
+2025-11-10 21:26:38,007 INFO    MainThread:1636174 [wandb_setup.py:_flush():67] Current SDK version is 0.19.8
+2025-11-10 21:26:38,007 INFO    MainThread:1636174 [wandb_setup.py:_flush():67] Configure stats pid to 1636174
+2025-11-10 21:26:38,007 INFO    MainThread:1636174 [wandb_setup.py:_flush():67] Loading settings from /new_disk4/xiaopeng_ye/.config/wandb/settings
+2025-11-10 21:26:38,007 INFO    MainThread:1636174 [wandb_setup.py:_flush():67] Loading settings from /new_disk4/xiaopeng_ye/baosong_yuan/CreAgent/wandb/settings
+2025-11-10 21:26:38,007 INFO    MainThread:1636174 [wandb_setup.py:_flush():67] Loading settings from environment variables
+2025-11-10 21:26:38,007 INFO    MainThread:1636174 [wandb_init.py:setup_run_log_directory():647] Logging user logs to /new_disk4/xiaopeng_ye/baosong_yuan/CreAgent/wandb/run-20251110_212638-f9tah5il/logs/debug.log
+2025-11-10 21:26:38,007 INFO    MainThread:1636174 [wandb_init.py:setup_run_log_directory():648] Logging internal logs to /new_disk4/xiaopeng_ye/baosong_yuan/CreAgent/wandb/run-20251110_212638-f9tah5il/logs/debug-internal.log
+2025-11-10 21:26:38,008 INFO    MainThread:1636174 [wandb_init.py:init():761] calling init triggers
+2025-11-10 21:26:38,008 INFO    MainThread:1636174 [wandb_init.py:init():766] wandb.init called with sweep_config: {}
+config: {'llm': 'custom', 'api_base': 'http://localhost:7787/v1', 'api_key': 'EMPTY', 'llm_model_name': '/new_disk4/xiaopeng_ye/LLMs/Qwen2.5-7B-Instruct', 'embedding_model_path': '/new_disk4/xiaopeng_ye/baosong_yuan/models/all-mpnet-base-v2', 'item_save_path': 'saves/item_saved.json', 'user_path': 'data/youtube/users.json', 'provider_path': 'data/youtube/providers.json', 'profile_path': 'data/youtube/provider_profile.json', 'interaction_path': 'saves/interaction.csv', 'ckpt_path': 'data/data/ckpt', 'index_name': 'data/data/faiss_index', 'simulator_dir': 'data/data/simulator', 'seed': 2024, 'rec_model': 'MF', 'reranking_model': None, 'tradeoff_para': 0.5, 'epoch_num': 60, 'batch_size': 1024, 'embedding_size': 64, 'round': 110, 'active_agent_threshold': 1500, 'agent_num': 1500, 'provider_agent_num': 50, 'temperature': 0, 'max_token': 1500, 'execution_mode': 'parallel', 'interval': '5h', 'max_retries': 100, 'verbose': True, 'active_method': 'random', 'active_prob': 0.5, 'active_proagent_threshold': 50, 'proagent_active_method': 'random', 'agent_memory': 'recagent', 'rec_random_k': 0, 'max_item_num': 100000, 'TopK': 5, 'item_recency': 10, 'finetune': False, 'provider_decision_policy': 'bounded_rational', 'provider_lr': 0.1, 'provider_decision_mode': 'click_based', 'lr': 0.001, 'weight_decay': 0.0001, 'max_len': 50, 'user_id_dim': 32, 'item_id_dim': 32, 'item_brand_id_dim': 32, 'item_cate_id_dim': 32, 'hid_units': [200, 80, 1], 'dropout': 0.1, 'with_rec': True, 'with_leave': True, 'mlp_hidden_size': [200, 80], 'cross_layer_num': 3, 'dropout_prob': 0.1, 'max_seq_len': 20, 'max_workers': 4, 'reranking_start_step': 10, 'provider_decision_making': True, 'eval_agent_num': 1500, '_wandb': {}}
+2025-11-10 21:26:38,008 INFO    MainThread:1636174 [wandb_init.py:init():784] starting backend
+2025-11-10 21:26:38,008 INFO    MainThread:1636174 [wandb_init.py:init():788] sending inform_init request
+2025-11-10 21:26:38,012 INFO    MainThread:1636174 [backend.py:_multiprocessing_setup():101] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2025-11-10 21:26:38,013 INFO    MainThread:1636174 [wandb_init.py:init():798] backend started and connected
+2025-11-10 21:26:38,015 INFO    MainThread:1636174 [wandb_init.py:init():891] updated telemetry
+2025-11-10 21:26:38,021 INFO    MainThread:1636174 [wandb_init.py:init():915] communicating run to backend with 90.0 second timeout
+2025-11-10 21:26:38,742 INFO    MainThread:1636174 [wandb_init.py:init():990] starting run threads in backend
+2025-11-10 21:26:38,953 INFO    MainThread:1636174 [wandb_run.py:_console_start():2375] atexit reg
+2025-11-10 21:26:38,954 INFO    MainThread:1636174 [wandb_run.py:_redirect():2227] redirect: wrap_raw
+2025-11-10 21:26:38,954 INFO    MainThread:1636174 [wandb_run.py:_redirect():2292] Wrapping output streams.
+2025-11-10 21:26:38,954 INFO    MainThread:1636174 [wandb_run.py:_redirect():2315] Redirects installed.
+2025-11-10 21:26:38,956 INFO    MainThread:1636174 [wandb_init.py:init():1032] run started, returning control to user process
+2025-11-10 21:26:38,994 INFO    MsgRouterThr:1636174 [mailbox.py:close():129] Closing mailbox, abandoning 2 handles.

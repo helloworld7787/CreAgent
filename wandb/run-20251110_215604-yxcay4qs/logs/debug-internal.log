@@ -1,0 +1,15 @@
+{"time":"2025-11-10T21:56:04.82142616+08:00","level":"INFO","msg":"stream: starting","core version":"0.19.8","symlink path":"/new_disk4/xiaopeng_ye/baosong_yuan/CreAgent/wandb/run-20251110_215604-yxcay4qs/logs/debug-core.log"}
+{"time":"2025-11-10T21:56:05.038993271+08:00","level":"INFO","msg":"created new stream","id":"yxcay4qs"}
+{"time":"2025-11-10T21:56:05.039066587+08:00","level":"INFO","msg":"stream: started","id":"yxcay4qs"}
+{"time":"2025-11-10T21:56:05.039101663+08:00","level":"INFO","msg":"writer: Do: started","stream_id":"yxcay4qs"}
+{"time":"2025-11-10T21:56:05.039138563+08:00","level":"INFO","msg":"sender: started","stream_id":"yxcay4qs"}
+{"time":"2025-11-10T21:56:05.039155445+08:00","level":"INFO","msg":"handler: started","stream_id":"yxcay4qs"}
+{"time":"2025-11-10T21:56:05.568679466+08:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-11-10T22:48:54.115500088+08:00","level":"INFO","msg":"stream: closing","id":"yxcay4qs"}
+{"time":"2025-11-10T22:48:54.115578831+08:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-11-10T22:48:54.116638104+08:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-11-10T22:48:56.129260994+08:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-11-10T22:48:56.816758412+08:00","level":"INFO","msg":"handler: closed","stream_id":"yxcay4qs"}
+{"time":"2025-11-10T22:48:56.816828562+08:00","level":"INFO","msg":"writer: Close: closed","stream_id":"yxcay4qs"}
+{"time":"2025-11-10T22:48:56.816849216+08:00","level":"INFO","msg":"sender: closed","stream_id":"yxcay4qs"}
+{"time":"2025-11-10T22:48:56.816985667+08:00","level":"INFO","msg":"stream: closed","id":"yxcay4qs"}

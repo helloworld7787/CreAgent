@@ -1,0 +1,177 @@
+_wandb:
+    value:
+        cli_version: 0.19.8
+        m: []
+        python_version: 3.10.19
+        t:
+            "1":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 51
+                - 53
+                - 55
+                - 71
+                - 75
+                - 86
+                - 95
+                - 98
+                - 105
+            "2":
+                - 1
+                - 5
+                - 11
+                - 41
+                - 49
+                - 51
+                - 53
+                - 55
+                - 71
+                - 75
+                - 86
+                - 95
+                - 98
+                - 105
+            "3":
+                - 13
+                - 16
+                - 23
+                - 55
+            "4": 3.10.19
+            "5": 0.19.8
+            "6": 4.47.1
+            "8":
+                - 5
+            "12": 0.19.8
+            "13": linux-x86_64
+TopK:
+    value: 5
+active_agent_threshold:
+    value: 1500
+active_method:
+    value: random
+active_proagent_threshold:
+    value: 50
+active_prob:
+    value: 0.5
+agent_memory:
+    value: recagent
+agent_num:
+    value: 1500
+api_base:
+    value: http://localhost:7787/v1
+api_key:
+    value: EMPTY
+batch_size:
+    value: 1024
+ckpt_path:
+    value: data/data/ckpt
+cross_layer_num:
+    value: 3
+dropout:
+    value: 0.1
+dropout_prob:
+    value: 0.1
+embedding_model_path:
+    value: /new_disk4/xiaopeng_ye/baosong_yuan/models/all-mpnet-base-v2
+embedding_size:
+    value: 64
+epoch_num:
+    value: 60
+eval_agent_num:
+    value: 1500
+execution_mode:
+    value: parallel
+finetune:
+    value: false
+hid_units:
+    value:
+        - 200
+        - 80
+        - 1
+index_name:
+    value: data/data/faiss_index
+interaction_path:
+    value: saves/interaction.csv
+interval:
+    value: 5h
+item_brand_id_dim:
+    value: 32
+item_cate_id_dim:
+    value: 32
+item_id_dim:
+    value: 32
+item_recency:
+    value: 10
+item_save_path:
+    value: saves/item_saved.json
+llm:
+    value: custom
+llm_model_name:
+    value: /new_disk4/xiaopeng_ye/LLMs/Qwen2.5-7B-Instruct
+lr:
+    value: 0.001
+max_item_num:
+    value: 100000
+max_len:
+    value: 50
+max_retries:
+    value: 100
+max_seq_len:
+    value: 20
+max_token:
+    value: 1500
+max_workers:
+    value: 4
+mlp_hidden_size:
+    value:
+        - 200
+        - 80
+proagent_active_method:
+    value: random
+profile_path:
+    value: data/youtube/provider_profile.json
+provider_agent_num:
+    value: 50
+provider_decision_making:
+    value: true
+provider_decision_mode:
+    value: click_based
+provider_decision_policy:
+    value: bounded_rational
+provider_lr:
+    value: 0.1
+provider_path:
+    value: data/youtube/providers.json
+rec_model:
+    value: MF
+rec_random_k:
+    value: 0
+reranking_model:
+    value: null
+reranking_start_step:
+    value: 10
+round:
+    value: 110
+seed:
+    value: 2024
+simulator_dir:
+    value: data/data/simulator
+temperature:
+    value: 0
+tradeoff_para:
+    value: 0.5
+user_id_dim:
+    value: 32
+user_path:
+    value: data/youtube/users.json
+verbose:
+    value: true
+weight_decay:
+    value: 0.0001
+with_leave:
+    value: true
+with_rec:
+    value: true
