@@ -1,16 +1,18 @@
 # name of LLM model, 'custom' for custom model
 llm: custom
-api_base: http://localhost:7787/v1
+api_base: http://localhost:8000/v1
 api_key: EMPTY
-llm_model_name: /new_disk4/xiaopeng_ye/LLMs/Qwen2.5-7B-Instruct
+llm_model_name: /new_disk3/xiaopeng_ye/LLMs/Qwen2.5-7B-Instruct
 # embedding model path
-embedding_model_path: /new_disk4/xiaopeng_ye/baosong_yuan/models/all-mpnet-base-v2
+embedding_model_path: /new_disk3/xiaopeng_ye/baosong_yuan/model/all-mpnet-base-v2
 # path for item data
 item_save_path: saves/item_saved.json
 # path for user data
 user_path: data/youtube/users.json   #data/small_user.csv    #user_df.csv
 # path for provider data
 provider_path: data/youtube/providers.json     #data/provider_profile.json
+# path for items without providers (optional, can be empty string or null to skip)
+no_provider_items_path: data/youtube/no_provider_items.json
 # path for save interaction records
 profile_path: data/youtube/provider_profile.json
 # path for save interaction records
@@ -38,11 +40,11 @@ embedding_size: 64
 # learning rate for recommender system model
 #lr: 0.001
 # number of epochs
-round: 3
+round: 110
 # number of agents, which cannot exceed the number of user in user.csv
 active_agent_threshold: 1500 #110
 # method for choose agent to be active, random, sample, or marginal
-agent_num:  1500  #100
+agent_num:  100 #1500  #100
 # number of provider agents, which cannot exceed the number of providers in provider.csv
 provider_agent_num:  50
 # temperature for LLM

@@ -1,0 +1,63 @@
+[
+    {
+        "name": "Breaking News: Global Climate Summit 2024",
+        "genre": "News & Politics",
+        "tags": ["climate change", "global summit", "environment"],
+        "description": "Live coverage of the Global Climate Summit 2024 featuring world leaders discussing environmental policies and climate action plans."
+    },
+    {
+        "name": "Top 10 AI Breakthroughs of 2024",
+        "genre": "Science & Technology",
+        "tags": ["artificial intelligence", "technology", "innovation"],
+        "description": "Exploring the most significant advancements in artificial intelligence this year, from GPT-5 to quantum computing applications."
+    },
+    {
+        "name": "Epic Movie Trailer: Space Odyssey Returns",
+        "genre": "Film & Animation",
+        "tags": ["movie trailer", "sci-fi", "space"],
+        "description": "The official trailer for the highly anticipated sequel to the classic space adventure series, featuring stunning visual effects."
+    },
+    {
+        "name": "Relaxing Piano Music - 3 Hours",
+        "genre": "Music",
+        "tags": ["relaxing music", "piano", "meditation"],
+        "description": "Three hours of peaceful piano melodies perfect for studying, working, or relaxation. Instrumental background music."
+    },
+    {
+        "name": "How to Build Your First Website in 2024",
+        "genre": "Howto & Style",
+        "tags": ["web development", "tutorial", "coding"],
+        "description": "Complete beginner's guide to creating a professional website from scratch using modern tools and frameworks."
+    },
+    {
+        "name": "World Cup 2024 Highlights",
+        "genre": "Sports",
+        "tags": ["soccer", "world cup", "sports highlights"],
+        "description": "Best moments and goals from this year's World Cup tournament featuring incredible plays and dramatic finishes."
+    },
+    {
+        "name": "Stand-Up Comedy Special: Laughing Out Loud",
+        "genre": "Comedy",
+        "tags": ["stand-up", "comedy", "entertainment"],
+        "description": "Hilarious stand-up comedy special featuring jokes about everyday life, relationships, and modern technology."
+    },
+    {
+        "name": "Amazing Wildlife Documentary: African Safari",
+        "genre": "Pets & Animals",
+        "tags": ["wildlife", "documentary", "animals"],
+        "description": "Journey through the African savanna to witness incredible wildlife behavior and breathtaking natural landscapes."
+    },
+    {
+        "name": "Ultimate Gaming Montage 2024",
+        "genre": "Gaming",
+        "tags": ["gaming", "montage", "esports"],
+        "description": "Epic gaming moments compilation featuring the best plays from top streamers and professional esports tournaments."
+    },
+    {
+        "name": "History of Ancient Civilizations",
+        "genre": "Education",
+        "tags": ["history", "education", "ancient civilizations"],
+        "description": "Educational deep dive into ancient civilizations including Egypt, Rome, and Mesopotamia, exploring their cultures and achievements."
+    }
+]
+

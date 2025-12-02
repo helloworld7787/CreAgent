@@ -123,7 +123,7 @@ class ProAgent(GenerativeAgent):
         self.item_acc_click[item_id] += 1
 
     def update_round(self, round_cnt):
-        if len(self.item_round_click) < round_cnt:
+        if len(self.item_round_click) < round_cnt:  #为新的一轮创建新的点击和曝光的记录字典
             self.item_round_click.append({item: 0 for item in self.items.keys()})
         if len(self.item_round_exposure) < round_cnt:
             self.item_round_exposure.append({item: 0 for item in self.items.keys()})

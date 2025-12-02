@@ -1,0 +1,15 @@
+[
+    {
+        "name": "Your Item Name Here",
+        "genre": "Entertainment",
+        "tags": ["tag1", "tag2", "tag3"],
+        "description": "Write your item description here. Be as detailed as possible."
+    },
+    {
+        "name": "Another Item Example",
+        "genre": "Education",
+        "tags": ["learning", "tutorial"],
+        "description": "This is another example item. You can add as many items as you need."
+    }
+]
+

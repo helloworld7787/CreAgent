@@ -25,6 +25,7 @@ class Data:
         self.item2provider = {}
         self.item_token2id = {}
         self.item_provider_matrix = None
+        self.no_provider_items = set()  # Track items without providers
 
         self.db = None
         # self.load_items(config["item_path"])
@@ -189,6 +190,73 @@ class Data:
 
 
             cnt += 1
+
+    def load_no_provider_items(self, file_path):
+        """
+        Load items without providers from a JSON file.
+        These items will participate in recommendations but won't have associated providers.
+        
+        Expected JSON format:
+        [
+            {
+                "name": "item_name",
+                "genre": "category",
+                "tags": ["tag1", "tag2"],
+                "description": "item description"
+            },
+            ...
+        ]
+        """
+        import os
+        if not os.path.exists(file_path):
+            print(f"No provider items file found at {file_path}, skipping...")
+            return
+        
+        try:
+            no_provider_items = json_reader(file_path)
+            
+            # Get the current max item ID to continue numbering
+            if len(self.items) > 0:
+                current_max_id = max(self.items.keys())
+            else:
+                current_max_id = 0
+            
+            item_cnt = current_max_id + 1
+            loaded_count = 0
+            
+            for item_dict in no_provider_items:
+                self.items[item_cnt] = {
+                    "name": item_dict.get("name", f"No Provider Item {item_cnt}").strip(),
+                    "provider_name": None,  # No provider
+                    "provider_id": None,    # No provider
+                    "genre": item_dict.get("genre", "Entertainment"),
+                    "upload_time": -999,  # Pre-existing items
+                    "tags": item_dict.get("tags", []),
+                    "description": item_dict.get("description", "").strip(),
+                    "inter_cnt": 0,
+                    "mention_cnt": 0,
+                }
+                # Mark this item as having no provider
+                self.no_provider_items.add(item_cnt)
+                # Do NOT add to item2provider mapping
+                item_cnt += 1
+                loaded_count += 1
+            
+            print(f"Loaded {loaded_count} items without providers from {file_path}")
+        except Exception as e:
+            print(f"Error loading no provider items from {file_path}: {e}")
+
+    def has_provider(self, item_id):
+        """
+        Check if an item has an associated provider.
+        
+        Args:
+            item_id: int, item ID
+            
+        Returns:
+            bool: True if item has a provider, False otherwise
+        """
+        return item_id not in self.no_provider_items
 
     def get_full_items(self):
         return list(self.items.keys())

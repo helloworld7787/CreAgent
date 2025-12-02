@@ -58,21 +58,21 @@ class Simulator:
         self.logger = logger
         self.round_cnt = 0
         self.round_msg: List[Message] = []
-        self.active_agents: List[int] = []  # active agents in current round
-        self.active_proagents: List[int] = []
-        self.active_agent_threshold = config["active_agent_threshold"]
-        self.active_proagent_threshold = config["active_proagent_threshold"]
-        self.active_method = config["active_method"]
-        self.proagent_active_method = config["proagent_active_method"]
+        self.active_agents: List[int] = []  # active agents in current round #存储每一轮被激活（唤醒）的 Agent 列表。不是所有 Agent 每轮都在工作，系统会根据策略选择一部分
+        self.active_proagents: List[int] = [] #存储每一轮被激活（唤醒）的 Provider Agent 列表。
+        self.active_agent_threshold = config["active_agent_threshold"] #设置每轮激活 Agent 的数量阈值。超过这个阈值的 Agent 将不会被激活。
+        self.active_proagent_threshold = config["active_proagent_threshold"] 
+        self.active_method = config["active_method"] #选择激活 Agent 的方法，可以是 "random"（随机选择）或 "marginal"（根据边际效用选择）。
+        self.proagent_active_method = config["proagent_active_method"] 
         self.file_name_path: List[str] = []
-        self.play_event = threading.Event()
-        self.working_agents: List[RecAgent] = []  # busy agents
-        self.now = datetime.now().replace(hour=8, minute=0, second=0)
-        self.interval = interval.parse_interval(config["interval"])
-        self.round_entropy = []
-        self.round_provider_num = []
+        self.play_event = threading.Event() # 事件对象，用于控制 Agent 的运行和暂停。
+        self.working_agents: List[RecAgent] = []  # busy agents #记录当前正在忙碌（执行任务中）的 Agent，用于并发管理。
+        self.now = datetime.now().replace(hour=8, minute=0, second=0) #当前时间，用于记录 Agent 的运行时间。硬编码初始化为“今天的早上 8:00”
+        self.interval = interval.parse_interval(config["interval"])#每一轮结束，self.now 就会增加这个间隔。
+        self.round_entropy = [] #记录每轮的熵值，用于评估系统的多样性和创新性。
+        self.round_provider_num = [] #记录了系统演化过程中，每一轮还有多少创作者在产生内容，用于分析生态的健康度
         # self.rec_cnt = [20] * config["agent_num"]
-        self.rec_stat = message.RecommenderStat(
+        self.rec_stat = message.RecommenderStat( #记录当前系统的瞬时状态（实时数据），并利用 Pydantic 保证数据结构规范
             tot_user_num=0,
             cur_user_num=0,
             tot_item_num=0,
@@ -82,13 +82,13 @@ class Simulator:
         )
 
 
-        self.new_round_item = []
+        self.new_round_item = [] #记存储当前轮次新发布的物品（视频/帖子）。
         self.tokenizer, self.model = None, None
         self.embedding_size, self.embedding_model = utils.get_embedding_model(self.config['embedding_model_path'])
-        self.leave_providers = []
+        self.leave_providers = [] #记录离开系统的provider
         if os.path.exists(self.config['profile_path']):
             with open(self.config['profile_path'], 'r') as f:
-                self.provider_profile_dict = json.load(f)
+                self.provider_profile_dict = json.load(f) #读取Provider的画像（如性格、风格、历史数据）
         else:
             self.provider_profile_dict = {}
 
@@ -97,10 +97,17 @@ class Simulator:
     def get_file_name_path(self):
         return self.file_name_path
 
-    def load_simulator(self):
+    def load_simulator(self): #load_simulator 函数的作用是组装和启动模拟器的各个核心组件，使其进入"准备就绪"状态。
+                                #如果说 __init__ 只是在画图纸（设置配置、日志等），那么 load_simulator 就是在真正地造机器（加载数据、创建 Agent、初始化推荐模型）。
         """Load and initiate the simulator."""
         self.round_cnt = 0
         self.data = Data(self.config)
+        
+        # Load items without providers if configured
+        if "no_provider_items_path" in self.config and self.config["no_provider_items_path"]:
+            self.data.load_no_provider_items(self.config["no_provider_items_path"])
+            self.logger.info(f"Loaded {len(self.data.no_provider_items)} items without providers.")
+        
         self.agents = self.agent_creation()
         self.provider_agents = self.provider_agent_creation()
         self.recsys = Recommender(self.config, self.logger, self.data)
@@ -108,7 +115,7 @@ class Simulator:
         self.logger.info(f'Config :{self.config}')
 
 
-        for uid, u_dict in self.data.users.items():
+        for uid, u_dict in self.data.users.items(): #初始化推荐系统模型的训练数据（冷启动预热）
             for iid in u_dict['history']:
                 self.recsys.add_train_data(uid, iid, 1)
             all_item_id = list(self.data.items.keys())
@@ -201,7 +208,7 @@ class Simulator:
         name = proagent.name
         # if self.round_cnt == 1:
         #     proagent.initialize_provider_profile()
-        proagent.update_round(self.round_cnt)
+        proagent.update_round(self.round_cnt)  #初始化统计表，重复了
         # if not self.check_proactive(agent_id):
         #     return message
         user_interest_dict = self.data.get_user_interest_dict()
@@ -266,18 +273,18 @@ class Simulator:
                 choose_genre = 'WRONG'
                 choice = 'Wrong'
                 raise ValueError(f'Not Valid decision_policy:{decision_policy}')
-        if len(proagent.new_round_item) > 0:
-            new_item_id = proagent.new_round_item[-1]
-            new_item_click = proagent.item_acc_click[new_item_id]
+        if len(proagent.new_round_item) > 0:  # 初始的时候new_round_item为空，发布新物品后，new_round_item中会添加发布过的item的id，按照顺序依次累积
+            new_item_id = proagent.new_round_item[-1] #上一轮发布的item的id
+            new_item_click = proagent.item_acc_click[new_item_id] #上一轮发布的item的点击次数
             new_item_genre = proagent.items[new_item_id]['genre']
-            if choose_genre == new_item_genre:
+            if choose_genre == new_item_genre: 
                 exploit = True
-            else:
+            else: 
                 exploit = False
-            utils.save_action_records(self.round_cnt, proagent.name, new_item_click, exploit, self.config)
+            utils.save_action_records(self.round_cnt, proagent.name, new_item_click, exploit, self.config) #保存行为记录
 
         retries = 0
-        while retries < 5:
+        while retries < 5:  #LLM 有时会生成格式错误的内容（如缺少字段）。最多重试 5 次，如果都失败就抛出异常。
             try:
                 generate_result = proagent.generating(action, choice, choose_genre, analyze_history)
                 item_name, item_genre, item_tags, item_description = utils.response_to_item(generate_result, choose_genre)
@@ -611,13 +618,20 @@ class Simulator:
 
 
     def update_exposure_to_providers(self, exposed_item_id):
+        # Skip if item has no provider
+        if not self.data.has_provider(exposed_item_id):
+            return
+        
         # print(f'item2provider:{self.item2provider}')
         belong_provider_agent = self.provider_agents[self.data.item2provider[exposed_item_id]]
         # print(f'update exposure to {belong_provider_agent.name}')
         belong_provider_agent.update_exposure(exposed_item_id, self.round_cnt)
 
     def update_click_to_providers(self, clicked_item_id):
-
+        # Skip if item has no provider
+        if not self.data.has_provider(clicked_item_id):
+            return
+        
         belong_provider_agent = self.provider_agents[self.data.item2provider[clicked_item_id]]
         # print(f'update click to {belong_provider_agent.name}')
         belong_provider_agent.update_click(clicked_item_id, self.round_cnt)
@@ -734,14 +748,14 @@ class Simulator:
 
     def update_round(self, round_cnt):
         self.round_cnt = round_cnt + 1
-        self.new_round_item.clear()
+        self.new_round_item.clear()  #清空列表中的所有元素，使列表变为空列表 []
         self.active_proagents.clear()
         self.active_agents.clear()
         self.recsys.round_record.clear()
 
-        if self.config['rec_model'] not in ['Random']:
-            if self.round_cnt % 5 == 1:
-                if self.config['rec_model'] == 'BPR':
+        if self.config['rec_model'] not in ['Random']:  #如果推荐算法是 Random（随机推荐），就不需要训练
+            if self.round_cnt % 5 == 1:  # 每 5 轮训练一次
+                if self.config['rec_model'] == 'BPR':  #如果用的是 BPR（Bayesian Personalized Ranking）算法，调用专门的训练方法。
                     self.recsys.train_BPR()
                 else:
                     self.recsys.train()
@@ -752,13 +766,13 @@ class Simulator:
             name = proagent.name
             proagent.update_round(self.round_cnt)
                 # self.active_proagents.append(i)
-            if self.round_cnt == 1:
+            if self.round_cnt == 1: #初始化创作者画像（仅第 1 轮）
                 if name in self.provider_profile_dict.keys():
                     profile_text = proagent.initialize_provider_profile(profile=self.provider_profile_dict[name])
                 else:
                     profile_text = proagent.initialize_provider_profile(profile=None)
                     self.provider_profile_dict[name] = profile_text
-                    with open(self.config['profile_path'], 'w') as f:
+                    with open(self.config['profile_path'], 'w') as f: #w是覆盖模式，因为保存的是整个字典，所以采用覆盖模式
                         json.dump(self.provider_profile_dict, f, indent=4)
             if self.check_proactive(i):
                 continue
@@ -962,7 +976,7 @@ class Simulator:
 
 
 
-    def create_agent(self, i, api_key) -> RecAgent:
+    def create_agent(self, i, api_key) -> RecAgent:  #这个函数承诺会返回一个 RecAgent 类型的对象
         """
         Create an agent with the given id.
         """
@@ -1056,13 +1070,13 @@ class Simulator:
         # Add ONE user controllable user into the simulator if the flag is true.
         # We block the main thread when the user is creating the role.
 
-        if self.active_method == "random":
+        if self.active_method == "random": #设定活跃度分布
             active_probs = [self.config["active_prob"]] * agent_num
-        else:
+        else: #设定活跃度分布
             active_probs = np.random.pareto(self.config["active_prob"] * 10, agent_num)
             active_probs = active_probs / active_probs.max()
 
-        for i in tqdm(range(1, agent_num+1)):
+        for i in tqdm(range(1, agent_num+1)): #循环创建agent
             agent = self.create_agent(i, api_key)
             agent.active_prob = active_probs[agent.id-1]
             agents[agent.id] = agent
