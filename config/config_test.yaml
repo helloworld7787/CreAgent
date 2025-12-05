@@ -1,0 +1,139 @@
+# ============================================
+# 轻量级测试配置 - 用于验证系统正确性
+# 预计运行时间：3-5 分钟
+# ============================================
+
+# name of LLM model, 'custom' for custom model
+llm: custom
+api_base: http://localhost:8000/v1
+api_key: EMPTY
+llm_model_name: /new_disk3/xiaopeng_ye/LLMs/Qwen2.5-7B-Instruct
+# embedding model path
+embedding_model_path: /new_disk3/xiaopeng_ye/baosong_yuan/model/all-mpnet-base-v2
+# path for item data
+item_save_path: saves/item_saved_test.json
+# path for user data
+user_path: data/youtube/users.json
+# path for provider data
+provider_path: data/youtube/providers.json
+# 没有provider的item的json文件路径
+no_provider_items_path: data/youtube/no_provider_items.json
+# path for save interaction records
+profile_path: data/youtube/provider_profile.json
+# path for save interaction records
+interaction_path: saves/interaction_test.csv
+# directory name for faiss index
+ckpt_path: data/data/ckpt
+index_name: data/data/faiss_index
+# simulator directory name for saving and restoring
+simulator_dir: data/data/simulator
+
+
+# random seed
+seed: 2024
+
+# ============================================
+# 🔑 关键修改：推荐系统
+# ============================================
+rec_model: MF
+reranking_model: None
+tradeoff_para: 0.5
+
+# 训练轮数：60 → 10（快速训练）
+epoch_num: 10
+batch_size: 1024
+embedding_size: 64
+
+# ============================================
+# 🔑 关键修改：模拟轮数
+# ============================================
+# 总轮数：110 → 15（足够验证流程）
+round: 15
+
+# ============================================
+# 🔑 关键修改：Agent 数量
+# ============================================
+# 用户数量：100 → 20
+agent_num: 20
+# provider 数量：50 → 10
+provider_agent_num: 10
+# 活跃用户上限：1500 → 20
+active_agent_threshold: 20
+# 活跃 provider 上限：50 → 10
+active_proagent_threshold: 10
+
+# temperature for LLM
+temperature: 0
+# maximum number of tokens for LLM
+max_token: 1500
+
+# ============================================
+# 🔑 关键修改：执行模式
+# ============================================
+# 使用串行模式更容易调试（可选）
+execution_mode: parallel  # 改为 serial 方便看错误
+
+# time interval for action of agents
+interval: 5h
+# number of max retries for LLM API
+max_retries: 100
+# verbose mode
+verbose: True
+
+active_method: random
+active_prob: 0.5
+
+proagent_active_method: random
+agent_memory: recagent
+rec_random_k: 0
+
+max_item_num: 100000
+
+# 推荐列表长度
+TopK: 5
+
+# item 新鲜度：保持 10，确保无 provider items 被推荐
+item_recency: 10
+finetune: False
+
+# ============================================
+# 🔑 关键修改：Provider 决策策略
+# ============================================
+# random 不需要 LLM，速度最快；bounded_rational 需要 LLM
+provider_decision_policy: random  # 用 random 测试更快
+
+provider_lr: 0.1
+provider_decision_mode: click_based
+lr: 0.001
+weight_decay: 0.0001
+
+max_len: 50
+
+user_id_dim: 32
+item_id_dim: 32
+item_brand_id_dim: 32
+item_cate_id_dim: 32
+
+hid_units: [200, 80, 1]
+dropout: 0.1
+
+with_rec: True
+# 关闭 provider 离开机制（测试时简化）
+with_leave: False
+
+mlp_hidden_size: [200, 80]
+cross_layer_num: 3
+dropout_prob: 0.1
+
+max_seq_len: 20
+
+max_workers: 4
+
+# reranking 开始步骤
+reranking_start_step: 10
+
+# provider 决策开关
+provider_decision_making: True
+
+eval_agent_num: 1500
+

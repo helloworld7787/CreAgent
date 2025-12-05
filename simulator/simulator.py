@@ -91,6 +91,14 @@ class Simulator:
                 self.provider_profile_dict = json.load(f) #读取Provider的画像（如性格、风格、历史数据）
         else:
             self.provider_profile_dict = {}
+        
+        # 无 provider items 的性能统计
+        self.no_provider_item_stats = {
+            'clicks': {},      # {item_id: click_count}
+            'exposures': {},   # {item_id: exposure_count}
+            'round_clicks': {},    # {round_cnt: total_clicks}
+            'round_exposures': {}, # {round_cnt: total_exposures}
+        }
 
 
 
@@ -98,12 +106,12 @@ class Simulator:
         return self.file_name_path
 
     def load_simulator(self): #load_simulator 函数的作用是组装和启动模拟器的各个核心组件，使其进入"准备就绪"状态。
-                                #如果说 __init__ 只是在画图纸（设置配置、日志等），那么 load_simulator 就是在真正地造机器（加载数据、创建 Agent、初始化推荐模型）。
+                                # __init__ 画图纸（设置配置、日志等）， load_simulator 造机器（加载数据、创建 Agent、初始化推荐模型）。
         """Load and initiate the simulator."""
         self.round_cnt = 0
         self.data = Data(self.config)
         
-        # Load items without providers if configured
+        # 加载没有provider的item
         if "no_provider_items_path" in self.config and self.config["no_provider_items_path"]:
             self.data.load_no_provider_items(self.config["no_provider_items_path"])
             self.logger.info(f"Loaded {len(self.data.no_provider_items)} items without providers.")
@@ -337,7 +345,11 @@ class Simulator:
         recent_item_ids = []
         for item_id, item_dict in items.items():
             up_time = item_dict['upload_time']
-            if self.round_cnt - up_time <= item_recency:
+            # -778 表示无 provider item，先设置成永远可以被推荐
+            if up_time == -778:
+                recent_item_ids.append(item_id)
+            # 运行时创建的 items，只推荐最近 item_recency 轮的
+            elif self.round_cnt - up_time <= item_recency:
                 recent_item_ids.append(item_id)
         return recent_item_ids
 
@@ -425,7 +437,7 @@ class Simulator:
                 self.recsys.add_round_record(agent_id, true_rec_itemid, 1, self.round_cnt)
                 self.recsys.add_train_data(agent_id, true_rec_itemid, 1)
 
-                self.update_click_to_providers(true_rec_itemid)  # 点击更新给供应商
+                self.update_click_to_providers(true_rec_itemid)  # 点击更新给provider
                 self.update_exposure_to_providers(true_rec_itemid)
 
 
@@ -577,8 +589,10 @@ class Simulator:
                 feelings = agent.generate_feeling(
                     observation, self.now + timedelta(hours=duration)
                 )
-                provider_id = self.data.get_provider_id_by_item_id(true_rec_itemid)
-                self.provider_agents[provider_id].upload_comments(feelings)
+                # 只有当 item 有 provider 时才上传评论
+                if self.data.has_provider(true_rec_itemid):
+                    provider_id = self.data.get_provider_id_by_item_id(true_rec_itemid)
+                    self.provider_agents[provider_id].upload_comments(feelings)
                 self.logger.info(f"{name}({interest}) feels: {feelings}")
 
                 self.round_msg.append(
@@ -618,8 +632,9 @@ class Simulator:
 
 
     def update_exposure_to_providers(self, exposed_item_id):
-        # Skip if item has no provider
+        # 如果是无 provider item，记录到独立的统计系统
         if not self.data.has_provider(exposed_item_id):
+            self.update_no_provider_item_exposure(exposed_item_id)
             return
         
         # print(f'item2provider:{self.item2provider}')
@@ -628,13 +643,162 @@ class Simulator:
         belong_provider_agent.update_exposure(exposed_item_id, self.round_cnt)
 
     def update_click_to_providers(self, clicked_item_id):
-        # Skip if item has no provider
+        # 如果是无 provider item，记录到独立的统计系统
         if not self.data.has_provider(clicked_item_id):
+            self.update_no_provider_item_click(clicked_item_id)
             return
         
         belong_provider_agent = self.provider_agents[self.data.item2provider[clicked_item_id]]
         # print(f'update click to {belong_provider_agent.name}')
         belong_provider_agent.update_click(clicked_item_id, self.round_cnt)
+    
+    def update_no_provider_item_exposure(self, item_id):
+        """记录无 provider item 的曝光"""
+        if item_id not in self.no_provider_item_stats['exposures']: #如果item_id不在exposures字典中，则先新建，初始化值为0
+            self.no_provider_item_stats['exposures'][item_id] = 0
+        self.no_provider_item_stats['exposures'][item_id] += 1
+        
+        # 记录当前轮次的总曝光
+        if self.round_cnt not in self.no_provider_item_stats['round_exposures']:
+            self.no_provider_item_stats['round_exposures'][self.round_cnt] = 0
+        self.no_provider_item_stats['round_exposures'][self.round_cnt] += 1
+    
+    def update_no_provider_item_click(self, item_id):
+        """记录无 provider item 的点击"""
+        if item_id not in self.no_provider_item_stats['clicks']:
+            self.no_provider_item_stats['clicks'][item_id] = 0
+        self.no_provider_item_stats['clicks'][item_id] += 1
+        
+        # 记录当前轮次的总点击
+        if self.round_cnt not in self.no_provider_item_stats['round_clicks']:
+            self.no_provider_item_stats['round_clicks'][self.round_cnt] = 0
+        self.no_provider_item_stats['round_clicks'][self.round_cnt] += 1
+    
+    def get_no_provider_items_performance(self):
+        """
+        计算无 provider items 的性能指标
+        
+        返回:
+            dict: 包含各种性能指标的字典
+        """
+        stats = self.no_provider_item_stats
+        
+        # 总点击和总曝光
+        total_clicks = sum(stats['clicks'].values())
+        total_exposures = sum(stats['exposures'].values())
+        
+        # 整体CTR
+        overall_ctr = total_clicks / total_exposures if total_exposures > 0 else 0
+        
+        # 当前轮次的点击和曝光
+        round_clicks = stats['round_clicks'].get(self.round_cnt, 0)
+        round_exposures = stats['round_exposures'].get(self.round_cnt, 0)
+        round_ctr = round_clicks / round_exposures if round_exposures > 0 else 0
+        
+        # 每个item的CTR
+        item_ctrs = {}
+        for item_id in self.data.no_provider_items:
+            clicks = stats['clicks'].get(item_id, 0)
+            exposures = stats['exposures'].get(item_id, 0)
+            item_ctrs[item_id] = clicks / exposures if exposures > 0 else 0
+        
+        # 平均每个item的点击数
+        num_items = len(self.data.no_provider_items)
+        avg_clicks_per_item = total_clicks / num_items if num_items > 0 else 0
+        avg_exposures_per_item = total_exposures / num_items if num_items > 0 else 0
+        
+        # Top-K个最受欢迎的items
+        top_k = 5
+        sorted_items = sorted(stats['clicks'].items(), key=lambda x: x[1], reverse=True)
+        top_items = []
+        for item_id, clicks in sorted_items[:top_k]:
+            item_name = self.data.items[item_id]['name']
+            exposures = stats['exposures'].get(item_id, 0)
+            ctr = clicks / exposures if exposures > 0 else 0
+            top_items.append({
+                'item_id': item_id,
+                'name': item_name,
+                'clicks': clicks,
+                'exposures': exposures,
+                'ctr': ctr
+            })
+        
+        return {
+            'total_clicks': total_clicks,
+            'total_exposures': total_exposures,
+            'overall_ctr': overall_ctr,
+            'round_clicks': round_clicks,
+            'round_exposures': round_exposures,
+            'round_ctr': round_ctr,
+            'avg_clicks_per_item': avg_clicks_per_item,
+            'avg_exposures_per_item': avg_exposures_per_item,
+            'num_items': num_items,
+            'top_items': top_items,
+            'item_ctrs': item_ctrs
+        }
+    
+    def save_no_provider_items_report(self, save_path='saves/no_provider_items_report.json'):
+        """
+        保存无 provider items 的详细统计报告到文件
+        
+        参数:
+            save_path: 保存路径
+        """
+        if len(self.data.no_provider_items) == 0:
+            self.logger.info("No provider items to report.")
+            return
+        
+        stats = self.no_provider_item_stats
+        perf = self.get_no_provider_items_performance()
+        
+        # 构建详细报告
+        report = {
+            'summary': {
+                'total_items': perf['num_items'],
+                'total_clicks': perf['total_clicks'],
+                'total_exposures': perf['total_exposures'],
+                'overall_ctr': perf['overall_ctr'],
+                'avg_clicks_per_item': perf['avg_clicks_per_item'],
+                'avg_exposures_per_item': perf['avg_exposures_per_item'],
+            },
+            'per_round_stats': {
+                'clicks': stats['round_clicks'],
+                'exposures': stats['round_exposures'],
+            },
+            'per_item_stats': []
+        }
+        
+        # 为每个 item 生成详细统计
+        for item_id in self.data.no_provider_items:
+            item_info = self.data.items[item_id]
+            clicks = stats['clicks'].get(item_id, 0)
+            exposures = stats['exposures'].get(item_id, 0)
+            ctr = clicks / exposures if exposures > 0 else 0
+            
+            report['per_item_stats'].append({
+                'item_id': item_id,
+                'name': item_info['name'],
+                'genre': item_info['genre'],
+                'tags': item_info['tags'],
+                'description': item_info['description'],
+                'clicks': clicks,
+                'exposures': exposures,
+                'ctr': ctr,
+            })
+        
+        # 按点击数排序
+        report['per_item_stats'].sort(key=lambda x: x['clicks'], reverse=True)
+        
+        # 保存到文件
+        dir_name = os.path.dirname(save_path)
+        if dir_name:  # 只有当目录路径非空时才创建目录
+            os.makedirs(dir_name, exist_ok=True)
+        with open(save_path, 'w', encoding='utf-8') as f:
+            json.dump(report, f, indent=2, ensure_ascii=False)
+        
+        self.logger.info(f"No provider items report saved to: {save_path}")
+        
+        return report
 
 
     def construct_generate_prompts(self, analyze_responses_list, analyze_prompt_list):
@@ -1050,7 +1214,7 @@ class Simulator:
             memory=agent_memory,
             event=reset_event(self.now),
             config=self.config,
-            active_prob=self.data.providers[i]["frequency"]
+            active_prob=self.data.providers[i]["frequency"]  # 测试时改成1.0 强制100%激活，正式运行改回: self.data.providers[i]["frequency"]
 
         )
         # print(self.data.items)
@@ -1149,12 +1313,35 @@ if __name__ == '__main__':
         reward = simulator.get_user_feedbacks()
         # rewards.extend(mini_batch_rewards)
         genre_count = simulator.get_genre_item_count()
+        
+        # 获取no provider items的性能指标
+        no_provider_perf = simulator.get_no_provider_items_performance()
+        
+        # 每 10 轮输出一次详细统计
+        if step % 10 == 0 and no_provider_perf['num_items'] > 0:
+            logger.info(f"\n{'='*60}")
+            logger.info(f"Round {step} - No Provider Items Performance:")
+            logger.info(f"  Total Clicks: {no_provider_perf['total_clicks']}")
+            logger.info(f"  Total Exposures: {no_provider_perf['total_exposures']}")
+            logger.info(f"  Overall CTR: {no_provider_perf['overall_ctr']:.4f}")
+            logger.info(f"  Round CTR: {no_provider_perf['round_ctr']:.4f}")
+            logger.info(f"  Avg Clicks per Item: {no_provider_perf['avg_clicks_per_item']:.2f}")
+            logger.info(f"  Top 5 Items:")
+            for i, item in enumerate(no_provider_perf['top_items'], 1):
+                logger.info(f"    {i}. {item['name'][:30]}... - Clicks: {item['clicks']}, CTR: {item['ctr']:.4f}")
+            logger.info(f"{'='*60}\n")
+        
+        # 记录到 wandb
         wandb.log({
             "total_rewards": reward,
-        }
-        )
+        })
+    # 保存所有 items
     with open(simulator.config['item_save_path'], 'w') as json_file:
         json.dump(simulator.data.items, json_file)
+    
+    # 保存无 provider items 的统计报告
+    simulator.save_no_provider_items_report('saves/no_provider_items_report.json')
+    
     wandb.finish()
 
 

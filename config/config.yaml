@@ -11,7 +11,7 @@ item_save_path: saves/item_saved.json
 user_path: data/youtube/users.json   #data/small_user.csv    #user_df.csv
 # path for provider data
 provider_path: data/youtube/providers.json     #data/provider_profile.json
-# path for items without providers (optional, can be empty string or null to skip)
+# 没有provider的item的json文件路径
 no_provider_items_path: data/youtube/no_provider_items.json
 # path for save interaction records
 profile_path: data/youtube/provider_profile.json
@@ -32,7 +32,7 @@ rec_model: MF  #Pop
 reranking_model: None  #[TFROM, P_MMF, FairRec]
 tradeoff_para: 0.5 #100
 # train epoch number for recommender system model
-epoch_num: 60
+epoch_num: 60 
 # batch size for recommender system model
 batch_size: 1024
 # embedding size for recommender system model
@@ -40,13 +40,13 @@ embedding_size: 64
 # learning rate for recommender system model
 #lr: 0.001
 # number of epochs
-round: 110
+round: 15  # 测试时用 15，正式运行改回 110
 # number of agents, which cannot exceed the number of user in user.csv
-active_agent_threshold: 1500 #110
+active_agent_threshold: 20  # 测试时用 20，正式运行改回 1500
 # method for choose agent to be active, random, sample, or marginal
-agent_num:  100 #1500  #100
+agent_num: 20  # 测试时用 20，正式运行改回 100
 # number of provider agents, which cannot exceed the number of providers in provider.csv
-provider_agent_num:  50
+provider_agent_num: 10  # 测试时用 10，正式运行改回 50
 # temperature for LLM
 temperature: 0
 # maximum number of tokens for LLM
@@ -65,7 +65,7 @@ active_method: random
 # propability for agent to be active
 active_prob: 0.5
 
-active_proagent_threshold: 50
+active_proagent_threshold: 10  # 测试时用 10，正式运行改回 50
 proagent_active_method: random
 # implementation of agent memory, recagent or GenerativeAgentMemory
 agent_memory: recagent

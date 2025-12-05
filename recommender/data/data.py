@@ -25,7 +25,7 @@ class Data:
         self.item2provider = {}
         self.item_token2id = {}
         self.item_provider_matrix = None
-        self.no_provider_items = set()  # Track items without providers
+        self.no_provider_items = set()  # 保存没有provider的item的id
 
         self.db = None
         # self.load_items(config["item_path"])
@@ -193,10 +193,8 @@ class Data:
 
     def load_no_provider_items(self, file_path):
         """
-        Load items without providers from a JSON file.
-        These items will participate in recommendations but won't have associated providers.
-        
-        Expected JSON format:
+        从json文件中加载没有provider的item
+        需要的json格式：
         [
             {
                 "name": "item_name",
@@ -215,7 +213,7 @@ class Data:
         try:
             no_provider_items = json_reader(file_path)
             
-            # Get the current max item ID to continue numbering
+            # 获取当前最大的item id，继续编号
             if len(self.items) > 0:
                 current_max_id = max(self.items.keys())
             else:
@@ -226,19 +224,18 @@ class Data:
             
             for item_dict in no_provider_items:
                 self.items[item_cnt] = {
-                    "name": item_dict.get("name", f"No Provider Item {item_cnt}").strip(),
-                    "provider_name": None,  # No provider
-                    "provider_id": None,    # No provider
+                    "name": item_dict.get("name", f"Item_{item_cnt}").strip(),
+                    "provider_name": None,  # 没有provider
+                    "provider_id": None, 
                     "genre": item_dict.get("genre", "Entertainment"),
-                    "upload_time": -999,  # Pre-existing items
+                    "upload_time": -778,  # -778标识no provider items，目前永远可被推荐
                     "tags": item_dict.get("tags", []),
                     "description": item_dict.get("description", "").strip(),
                     "inter_cnt": 0,
                     "mention_cnt": 0,
                 }
-                # Mark this item as having no provider
+                # 把id添加到no_provider_items，标记为没有provider的item
                 self.no_provider_items.add(item_cnt)
-                # Do NOT add to item2provider mapping
                 item_cnt += 1
                 loaded_count += 1
             
@@ -248,13 +245,9 @@ class Data:
 
     def has_provider(self, item_id):
         """
-        Check if an item has an associated provider.
-        
-        Args:
-            item_id: int, item ID
-            
-        Returns:
-            bool: True if item has a provider, False otherwise
+        检查一个item是否有对应的provider
+        需要传入item的id
+        有则返回True
         """
         return item_id not in self.no_provider_items
 
@@ -493,6 +486,9 @@ class Data:
     def get_provider_id_by_item(self, item_id):
         if item_id == 0:
             return 0
+        # 对于无 provider 的 items，返回 0（特殊标识）
+        if item_id not in self.item2provider:
+            return 0
         return self.item2provider[item_id]
 
 
@@ -508,6 +504,10 @@ class Data:
         raise ValueError(f'Provider {name} NOT FOUND')
 
     def get_provider_id_by_item_id(self, item_id):
+        """
+        获取item对应的provider_id
+        对于无provider的items，会抛出KeyError，调用前需要先使用has_provider()检查
+        """
         return self.item2provider[item_id]
 
     def get_user_interest_dict(self):
